@@ -1,8 +1,8 @@
-
 import 'package:flash_chat/Components/cutsomRoundedButton.dart';
 import 'package:flutter/material.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import '../constants.dart';
+import 'chat_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = "LoginScreen";
@@ -12,6 +12,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _auth = FirebaseAuth.instance;
+  String? email;
+  String? password;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +37,11 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 48.0,
             ),
             TextField(
-              onChanged: (value) {},
+              keyboardType: TextInputType.emailAddress,
+              textAlign: TextAlign.center,
+              onChanged: (value) {
+                email = value;
+              },
               decoration:
                   kTextFieldDecoration.copyWith(hintText: "Enter your email"),
             ),
@@ -41,7 +49,11 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 8.0,
             ),
             TextField(
-              onChanged: (value) {},
+              obscureText: true,
+              textAlign: TextAlign.center,
+              onChanged: (value) {
+                password = value;
+              },
               decoration: kTextFieldDecoration.copyWith(
                   hintText: "Enter your password"),
             ),
@@ -49,7 +61,19 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 24.0,
             ),
             CustomButtom(
-              onPress: () {},
+              onPress: () async {
+                try {
+                  final newUser = await _auth.signInWithEmailAndPassword(
+                    email: email.toString(),
+                    password: password.toString(),
+                  );
+                  if (newUser != null) {
+                    Navigator.pushNamed(context, ChatScreen.id);
+                  }
+                } catch (e) {
+                  print(e);
+                }
+              },
               buttonColor: Colors.lightBlueAccent,
               buttonTitle: 'Log In',
             )
